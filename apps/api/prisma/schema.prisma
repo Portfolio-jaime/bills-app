@@ -89,6 +89,8 @@ model FinancialPlan {
   foodBudget      Decimal  @db.Decimal(15, 2)
   transportBudget Decimal  @db.Decimal(15, 2)
   healthBudget    Decimal  @db.Decimal(15, 2)
+  utilitiesBudget     Decimal  @db.Decimal(15, 2) @default(0)
+  subscriptionsBudget Decimal  @db.Decimal(15, 2) @default(0)
   entertainmentBudget Decimal @db.Decimal(15, 2)
   otherExpenses   Decimal  @db.Decimal(15, 2)
   savingsGoal     Decimal  @db.Decimal(15, 2)

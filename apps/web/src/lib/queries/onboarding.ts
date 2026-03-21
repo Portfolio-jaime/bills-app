@@ -8,6 +8,11 @@ export interface OnboardingAccount {
   balance?: number
 }
 
+export interface IncomeEntry {
+  source: string
+  amount: string
+}
+
 export interface OnboardingPayload {
   name: string
   baseCurrency: string
@@ -17,6 +22,8 @@ export interface OnboardingPayload {
   foodBudget: number
   transportBudget: number
   healthBudget: number
+  utilitiesBudget: number
+  subscriptionsBudget: number
   entertainmentBudget: number
   otherExpenses: number
   goals: string[]

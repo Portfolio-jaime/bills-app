@@ -17,7 +17,13 @@ export const INCOME_SOURCES = [
   'freelance',
   'business',
   'investment',
+  'rental',
   'pension',
+  'scholarship',
+  'remittance',
+  'online_sales',
+  'bonus',
+  'crypto',
   'other',
 ] as const
 
@@ -27,7 +33,10 @@ export const FINANCIAL_GOALS = [
   'invest',
   'save_travel',
   'buy_home',
+  'buy_car',
   'retirement',
+  'education',
+  'start_business',
   'track_only',
 ] as const
 
@@ -96,6 +105,16 @@ export class CompleteOnboardingDto {
   @IsNumber()
   @Min(0)
   entertainmentBudget: number
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  utilitiesBudget: number
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  subscriptionsBudget: number
 
   @ApiProperty()
   @IsNumber()

@@ -117,22 +117,64 @@ export class AuthService {
 
   private async seedDefaultCategories(userId: string) {
     const defaults = [
-      // Expense categories
+      // ── Vivienda ──────────────────────────────────────
       { name: 'Housing', icon: '🏠', color: '#6366f1', type: 'EXPENSE' as const },
-      { name: 'Food & Dining', icon: '🍔', color: '#f59e0b', type: 'EXPENSE' as const },
+      // ── Alimentación ──────────────────────────────────
+      { name: 'Food & Groceries', icon: '🛒', color: '#f59e0b', type: 'EXPENSE' as const },
+      { name: 'Dining & Restaurants', icon: '🍽️', color: '#f97316', type: 'EXPENSE' as const },
+      // ── Transporte ────────────────────────────────────
       { name: 'Transport', icon: '🚗', color: '#3b82f6', type: 'EXPENSE' as const },
+      { name: 'Fuel & Gas', icon: '⛽', color: '#64748b', type: 'EXPENSE' as const },
+      { name: 'Rideshare & Taxis', icon: '🚕', color: '#0ea5e9', type: 'EXPENSE' as const },
+      // ── Salud ─────────────────────────────────────────
       { name: 'Health', icon: '❤️', color: '#ef4444', type: 'EXPENSE' as const },
-      { name: 'Entertainment', icon: '🎬', color: '#8b5cf6', type: 'EXPENSE' as const },
-      { name: 'Shopping', icon: '🛍️', color: '#ec4899', type: 'EXPENSE' as const },
-      { name: 'Education', icon: '📚', color: '#10b981', type: 'EXPENSE' as const },
+      { name: 'Pharmacy', icon: '💊', color: '#f43f5e', type: 'EXPENSE' as const },
+      { name: 'Gym & Fitness', icon: '🏋️', color: '#10b981', type: 'EXPENSE' as const },
+      // ── Servicios públicos ────────────────────────────
       { name: 'Utilities', icon: '💡', color: '#14b8a6', type: 'EXPENSE' as const },
-      { name: 'Subscriptions', icon: '📱', color: '#64748b', type: 'EXPENSE' as const },
-      // Income categories
+      { name: 'Electricity', icon: '⚡', color: '#fbbf24', type: 'EXPENSE' as const },
+      { name: 'Water', icon: '💧', color: '#3b82f6', type: 'EXPENSE' as const },
+      { name: 'Gas', icon: '🔥', color: '#ef4444', type: 'EXPENSE' as const },
+      { name: 'Internet', icon: '📡', color: '#06b6d4', type: 'EXPENSE' as const },
+      { name: 'Phone & Mobile', icon: '📱', color: '#8b5cf6', type: 'EXPENSE' as const },
+      // ── Plataformas y Suscripciones ───────────────────
+      { name: 'Subscriptions', icon: '📺', color: '#64748b', type: 'EXPENSE' as const },
+      { name: 'Streaming', icon: '🎬', color: '#dc2626', type: 'EXPENSE' as const },
+      { name: 'Music Subscriptions', icon: '🎵', color: '#16a34a', type: 'EXPENSE' as const },
+      { name: 'Gaming', icon: '🎮', color: '#8b5cf6', type: 'EXPENSE' as const },
+      { name: 'Software & Apps', icon: '💻', color: '#0ea5e9', type: 'EXPENSE' as const },
+      // ── Educación ─────────────────────────────────────
+      { name: 'Education', icon: '📚', color: '#10b981', type: 'EXPENSE' as const },
+      { name: 'School & University', icon: '🎓', color: '#06b6d4', type: 'EXPENSE' as const },
+      // ── Entretenimiento ───────────────────────────────
+      { name: 'Entertainment', icon: '🎬', color: '#8b5cf6', type: 'EXPENSE' as const },
+      { name: 'Social & Dining Out', icon: '🍺', color: '#f59e0b', type: 'EXPENSE' as const },
+      // ── Personal y estilo ─────────────────────────────
+      { name: 'Shopping', icon: '🛍️', color: '#ec4899', type: 'EXPENSE' as const },
+      { name: 'Clothing & Fashion', icon: '👕', color: '#ec4899', type: 'EXPENSE' as const },
+      { name: 'Beauty & Personal Care', icon: '💄', color: '#f472b6', type: 'EXPENSE' as const },
+      // ── Mascotas ──────────────────────────────────────
+      { name: 'Pets', icon: '🐶', color: '#a78bfa', type: 'EXPENSE' as const },
+      // ── Seguros y finanzas ────────────────────────────
+      { name: 'Insurance', icon: '🛡️', color: '#6366f1', type: 'EXPENSE' as const },
+      // ── Otros ─────────────────────────────────────────
+      { name: 'Other', icon: '📦', color: '#94a3b8', type: 'EXPENSE' as const },
+
+      // ── Ingresos ──────────────────────────────────────
       { name: 'Salary', icon: '💼', color: '#22c55e', type: 'INCOME' as const },
       { name: 'Freelance', icon: '💻', color: '#84cc16', type: 'INCOME' as const },
+      { name: 'Business Income', icon: '🏢', color: '#10b981', type: 'INCOME' as const },
       { name: 'Investments', icon: '📈', color: '#06b6d4', type: 'INCOME' as const },
+      { name: 'Rental Income', icon: '🏠', color: '#10b981', type: 'INCOME' as const },
+      { name: 'Pension', icon: '🏦', color: '#6366f1', type: 'INCOME' as const },
+      { name: 'Bonus & Commissions', icon: '🎁', color: '#f59e0b', type: 'INCOME' as const },
+      { name: 'Online Sales', icon: '🛒', color: '#3b82f6', type: 'INCOME' as const },
+      { name: 'Remittances', icon: '💸', color: '#a78bfa', type: 'INCOME' as const },
+      { name: 'Scholarship', icon: '🎓', color: '#06b6d4', type: 'INCOME' as const },
+      { name: 'Crypto & Trading', icon: '₿', color: '#f97316', type: 'INCOME' as const },
       { name: 'Other Income', icon: '💰', color: '#a3e635', type: 'INCOME' as const },
-      // Both
+
+      // ── Ambos ─────────────────────────────────────────
       { name: 'Transfer', icon: '↔️', color: '#94a3b8', type: 'BOTH' as const },
     ]
 

@@ -10,6 +10,7 @@ import {
   Wallet,
   PieChart,
   RefreshCw,
+  Tag,
   Settings,
   LogOut,
   TrendingUp,
@@ -20,6 +21,7 @@ const navItems = [
   { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { href: '/accounts', label: 'Accounts', icon: Wallet },
   { href: '/budgets', label: 'Budgets', icon: PieChart },
+  { href: '/categories', label: 'Categories', icon: Tag },
   { href: '/recurring', label: 'Recurring Bills', icon: RefreshCw },
 ]
 

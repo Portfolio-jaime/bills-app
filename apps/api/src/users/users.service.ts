@@ -59,6 +59,8 @@ export class UsersService {
       dto.foodBudget +
       dto.transportBudget +
       dto.healthBudget +
+      dto.utilitiesBudget +
+      dto.subscriptionsBudget +
       dto.entertainmentBudget +
       dto.otherExpenses
 
@@ -86,6 +88,8 @@ export class UsersService {
           foodBudget: dto.foodBudget,
           transportBudget: dto.transportBudget,
           healthBudget: dto.healthBudget,
+          utilitiesBudget: dto.utilitiesBudget,
+          subscriptionsBudget: dto.subscriptionsBudget,
           entertainmentBudget: dto.entertainmentBudget,
           otherExpenses: dto.otherExpenses,
           savingsGoal,
@@ -99,6 +103,8 @@ export class UsersService {
           foodBudget: dto.foodBudget,
           transportBudget: dto.transportBudget,
           healthBudget: dto.healthBudget,
+          utilitiesBudget: dto.utilitiesBudget,
+          subscriptionsBudget: dto.subscriptionsBudget,
           entertainmentBudget: dto.entertainmentBudget,
           otherExpenses: dto.otherExpenses,
           savingsGoal,
@@ -127,6 +133,8 @@ export class UsersService {
         { categoryName: 'Food & Groceries', amount: dto.foodBudget },
         { categoryName: 'Transport', amount: dto.transportBudget },
         { categoryName: 'Health', amount: dto.healthBudget },
+        { categoryName: 'Utilities', amount: dto.utilitiesBudget },
+        { categoryName: 'Subscriptions', amount: dto.subscriptionsBudget },
         { categoryName: 'Entertainment', amount: dto.entertainmentBudget },
         { categoryName: 'Other', amount: dto.otherExpenses },
       ]
