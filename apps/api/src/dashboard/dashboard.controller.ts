@@ -37,4 +37,19 @@ export class DashboardController {
   getTopExpenses(@Req() req: { user: { id: string } }) {
     return this.dashboardService.getTopExpenses(req.user.id)
   }
+
+  @Get('reports')
+  @ApiOperation({ summary: 'Monthly report: summary, daily spending, category breakdown, prev month delta' })
+  @ApiQuery({ name: 'year', required: false, type: Number })
+  @ApiQuery({ name: 'month', required: false, type: Number })
+  getMonthlyReport(
+    @Req() req: { user: { id: string } },
+    @Query('year') year?: string,
+    @Query('month') month?: string,
+  ) {
+    const now = new Date()
+    const y = year ? parseInt(year, 10) : now.getUTCFullYear()
+    const m = month ? parseInt(month, 10) : now.getUTCMonth() + 1
+    return this.dashboardService.getMonthlyReport(req.user.id, y, m)
+  }
 }

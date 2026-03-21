@@ -136,4 +136,99 @@ export class DashboardService {
   async getTopExpenses(userId: string) {
     return this.getCategoryChart(userId, 'EXPENSE')
   }
+
+  async getMonthlyReport(userId: string, year: number, month: number) {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { baseCurrency: true },
+    })
+
+    const monthStart = new Date(Date.UTC(year, month - 1, 1))
+    const monthEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
+    const prevMonthStart = new Date(Date.UTC(year, month - 2, 1))
+    const prevMonthEnd = new Date(Date.UTC(year, month - 1, 0, 23, 59, 59, 999))
+
+    const [incomeAgg, expenseAgg, prevIncomeAgg, prevExpenseAgg] = await Promise.all([
+      this.prisma.transaction.aggregate({
+        where: { userId, type: 'INCOME', date: { gte: monthStart, lte: monthEnd } },
+        _sum: { amountInBaseCurrency: true },
+      }),
+      this.prisma.transaction.aggregate({
+        where: { userId, type: 'EXPENSE', date: { gte: monthStart, lte: monthEnd } },
+        _sum: { amountInBaseCurrency: true },
+      }),
+      this.prisma.transaction.aggregate({
+        where: { userId, type: 'INCOME', date: { gte: prevMonthStart, lte: prevMonthEnd } },
+        _sum: { amountInBaseCurrency: true },
+      }),
+      this.prisma.transaction.aggregate({
+        where: { userId, type: 'EXPENSE', date: { gte: prevMonthStart, lte: prevMonthEnd } },
+        _sum: { amountInBaseCurrency: true },
+      }),
+    ])
+
+    const income = Number(incomeAgg._sum.amountInBaseCurrency ?? 0)
+    const expenses = Number(expenseAgg._sum.amountInBaseCurrency ?? 0)
+    const prevIncome = Number(prevIncomeAgg._sum.amountInBaseCurrency ?? 0)
+    const prevExpenses = Number(prevExpenseAgg._sum.amountInBaseCurrency ?? 0)
+    const delta = (curr: number, prev: number) =>
+      prev > 0 ? Math.round(((curr - prev) / prev) * 10000) / 100 : null
+
+    // Daily spending for the month
+    const daysInMonth = new Date(year, month, 0).getDate()
+    const dailyData: Array<{ day: number; income: number; expenses: number }> = []
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayStart = new Date(Date.UTC(year, month - 1, d))
+      const dayEnd = new Date(Date.UTC(year, month - 1, d, 23, 59, 59, 999))
+      const [inc, exp] = await Promise.all([
+        this.prisma.transaction.aggregate({
+          where: { userId, type: 'INCOME', date: { gte: dayStart, lte: dayEnd } },
+          _sum: { amountInBaseCurrency: true },
+        }),
+        this.prisma.transaction.aggregate({
+          where: { userId, type: 'EXPENSE', date: { gte: dayStart, lte: dayEnd } },
+          _sum: { amountInBaseCurrency: true },
+        }),
+      ])
+      dailyData.push({
+        day: d,
+        income: Number(inc._sum.amountInBaseCurrency ?? 0),
+        expenses: Number(exp._sum.amountInBaseCurrency ?? 0),
+      })
+    }
+
+    // Category breakdown for expenses
+    const categoryBreakdown = await this.getCategoryChart(userId, 'EXPENSE')
+
+    // Top 5 expense transactions
+    const topTransactions = await this.prisma.transaction.findMany({
+      where: { userId, type: 'EXPENSE', date: { gte: monthStart, lte: monthEnd } },
+      orderBy: { amountInBaseCurrency: 'desc' },
+      take: 5,
+      include: { category: { select: { name: true, icon: true, color: true } } },
+    })
+
+    return {
+      year,
+      month,
+      baseCurrency: user.baseCurrency,
+      income,
+      expenses,
+      savings: income - expenses,
+      savingsRate: income > 0 ? Math.round(((income - expenses) / income) * 10000) / 100 : 0,
+      prevIncome,
+      prevExpenses,
+      incomeDelta: delta(income, prevIncome),
+      expensesDelta: delta(expenses, prevExpenses),
+      dailyData,
+      categoryBreakdown,
+      topTransactions: topTransactions.map((t) => ({
+        id: t.id,
+        description: t.description,
+        amount: Number(t.amountInBaseCurrency),
+        date: t.date,
+        category: t.category,
+      })),
+    }
+  }
 }
