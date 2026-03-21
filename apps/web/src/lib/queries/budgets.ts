@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { authApi } from '@/lib/api'
-import type { BudgetStatus } from '@bills/types'
+import type { BudgetStatus, CreateBudgetDto } from '@bills/types'
 
 export function useBudgetStatus() {
   return useQuery<BudgetStatus[]>({
@@ -18,6 +18,19 @@ export function useBudgets() {
     queryFn: async () => {
       const { data } = await authApi.get('/budgets')
       return data
+    },
+  })
+}
+
+export function useCreateBudget() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (dto: CreateBudgetDto) => {
+      const { data } = await authApi.post('/budgets', dto)
+      return data
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['budgets'] })
     },
   })
 }
