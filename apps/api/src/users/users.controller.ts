@@ -1,8 +1,9 @@
-import { Controller, Get, Patch, Body, Req, UseGuards } from '@nestjs/common'
+import { Controller, Get, Patch, Post, Body, Req, UseGuards } from '@nestjs/common'
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { UsersService } from './users.service'
 import { UpdateProfileDto } from './dto/update-profile.dto'
+import { CompleteOnboardingDto } from './dto/onboarding.dto'
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -21,5 +22,14 @@ export class UsersController {
   @ApiOperation({ summary: 'Update current user profile' })
   async updateProfile(@Req() req: { user: { id: string } }, @Body() dto: UpdateProfileDto) {
     return this.usersService.updateProfile(req.user.id, dto)
+  }
+
+  @Post('onboarding')
+  @ApiOperation({ summary: 'Complete onboarding and create financial plan' })
+  async completeOnboarding(
+    @Req() req: { user: { id: string } },
+    @Body() dto: CompleteOnboardingDto,
+  ) {
+    return this.usersService.completeOnboarding(req.user.id, dto)
   }
 }

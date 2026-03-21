@@ -29,7 +29,7 @@ export default function RegisterPage() {
       if (result?.error) {
         setError('Registered but login failed. Please try signing in.')
       } else {
-        router.push('/dashboard')
+        router.push('/onboarding')
       }
     } catch (err: any) {
       const message = err.response?.data?.message ?? 'Registration failed'

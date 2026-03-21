@@ -61,21 +61,42 @@ enum Frequency {
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
-  id              String           @id @default(cuid())
-  email           String           @unique
-  passwordHash    String
-  name            String?
-  avatar          String?
-  phone           String?
-  bio             String?
-  baseCurrency    String           @default("COP")
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  accounts        Account[]
-  transactions    Transaction[]
-  categories      Category[]
-  budgets         Budget[]
-  recurringRules  RecurringRule[]
+  id                   String         @id @default(cuid())
+  email                String         @unique
+  passwordHash         String
+  name                 String?
+  avatar               String?
+  phone                String?
+  bio                  String?
+  baseCurrency         String         @default("COP")
+  onboardingCompleted  Boolean        @default(false)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  accounts             Account[]
+  transactions         Transaction[]
+  categories           Category[]
+  budgets              Budget[]
+  recurringRules       RecurringRule[]
+  financialPlan        FinancialPlan?
+}
+
+model FinancialPlan {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  monthlyIncome   Decimal  @db.Decimal(15, 2)
+  incomeSource    String
+  housingCost     Decimal  @db.Decimal(15, 2)
+  foodBudget      Decimal  @db.Decimal(15, 2)
+  transportBudget Decimal  @db.Decimal(15, 2)
+  healthBudget    Decimal  @db.Decimal(15, 2)
+  entertainmentBudget Decimal @db.Decimal(15, 2)
+  otherExpenses   Decimal  @db.Decimal(15, 2)
+  savingsGoal     Decimal  @db.Decimal(15, 2)
+  goals           String[]
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
