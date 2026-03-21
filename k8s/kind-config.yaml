@@ -1,0 +1,39 @@
+# kind-config.yaml — Local Kubernetes cluster configuration for Bills App
+#
+# Requirements: kind (https://kind.sigs.k8s.io) and kubectl
+#
+# Create cluster:
+#   kind create cluster --name bills --config kind-config.yaml
+#
+# Delete cluster:
+#   kind delete cluster --name bills
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+name: bills
+
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      # Web app accessible at http://localhost:3000
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      # API accessible at http://localhost:3002 (via NodePort)
+      - containerPort: 30002
+        hostPort: 3002
+        protocol: TCP
+      # Web via NodePort
+      - containerPort: 30000
+        hostPort: 3000
+        protocol: TCP
+
+  - role: worker
+  - role: worker

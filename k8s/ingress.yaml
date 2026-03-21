@@ -1,0 +1,41 @@
+---
+# Nginx Ingress for Bills App
+# Install ingress controller first:
+#   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+#   kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=90s
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bills-ingress
+  namespace: bills
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Enable CORS for API
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          # Route /api/* to the NestJS API
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: bills-api-svc
+                port:
+                  number: 3002
+          # Route everything else to Next.js
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bills-web-svc
+                port:
+                  number: 3000

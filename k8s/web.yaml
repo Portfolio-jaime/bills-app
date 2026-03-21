@@ -1,0 +1,81 @@
+---
+# Web Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bills-web
+  namespace: bills
+  labels:
+    app: bills-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bills-web
+  template:
+    metadata:
+      labels:
+        app: bills-web
+    spec:
+      containers:
+        - name: web
+          image: bills-web:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bills-config
+                  key: NEXT_PUBLIC_API_URL
+            - name: NEXTAUTH_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bills-config
+                  key: NEXTAUTH_URL
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bills-secrets
+                  key: NEXTAUTH_SECRET
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: bills-config
+                  key: NODE_ENV
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
+
+---
+# Web Service (NodePort for local kind access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: bills-web-svc
+  namespace: bills
+spec:
+  selector:
+    app: bills-web
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30000

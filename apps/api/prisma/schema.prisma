@@ -1,0 +1,223 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum AccountType {
+  BANK
+  CASH
+  INVESTMENT
+  CRYPTO
+  CREDIT_CARD
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum TransactionSource {
+  MANUAL
+  CONNECTOR_BELVO
+  CONNECTOR_WISE
+  CONNECTOR_BINANCE
+  CONNECTOR_STRIPE
+  CONNECTOR_PAYPAL
+  CONNECTOR_REVOLUT
+  CONNECTOR_COINBASE
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  BOTH
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum Frequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  passwordHash    String
+  name            String?
+  avatar          String?
+  phone           String?
+  bio             String?
+  baseCurrency    String           @default("COP")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  accounts        Account[]
+  transactions    Transaction[]
+  categories      Category[]
+  budgets         Budget[]
+  recurringRules  RecurringRule[]
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  type         AccountType
+  currency     String
+  balance      Decimal       @db.Decimal(15, 2)
+  color        String?
+  icon         String?
+  isManual     Boolean       @default(true)
+  connectorId  String?
+  isArchived   Boolean       @default(false)
+  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[] @relation("SourceAccount")
+  transfersIn  Transaction[] @relation("DestinationAccount")
+  recurringRules RecurringRule[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                   String            @id @default(cuid())
+  userId               String
+  accountId            String
+  toAccountId          String?
+  categoryId           String?
+  type                 TransactionType
+  amount               Decimal           @db.Decimal(15, 2)
+  currency             String
+  amountInBaseCurrency Decimal           @db.Decimal(15, 2)
+  exchangeRate         Decimal           @db.Decimal(10, 6)
+  date                 DateTime
+  description          String
+  notes                String?
+  tags                 String[]
+  attachments          String[]
+  isRecurring          Boolean           @default(false)
+  recurringRule        String?
+  source               TransactionSource @default(MANUAL)
+  externalId           String?
+  updatedAt            DateTime          @updatedAt
+  createdAt            DateTime          @default(now())
+  user                 User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account              Account           @relation("SourceAccount", fields: [accountId], references: [id])
+  toAccount            Account?          @relation("DestinationAccount", fields: [toAccountId], references: [id])
+  category             Category?         @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, externalId])
+  @@index([userId, date])
+  @@index([accountId])
+  @@index([categoryId])
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  userId       String
+  name         String
+  icon         String?
+  color        String?
+  type         CategoryType
+  parentId     String?
+  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime      @default(now())
+  parent       Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children     Category[]    @relation("CategoryHierarchy")
+  transactions Transaction[]
+  budgets      Budget[]
+  recurringRules RecurringRule[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Budget {
+  id         String       @id @default(cuid())
+  userId     String
+  categoryId String
+  amount     Decimal      @db.Decimal(15, 2)
+  period     BudgetPeriod
+  startDate  DateTime
+  isActive   Boolean      @default(true)
+  alertAt    Int          @default(80)
+  updatedAt  DateTime     @updatedAt
+  createdAt  DateTime     @default(now())
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category     @relation(fields: [categoryId], references: [id])
+
+  @@unique([categoryId, startDate])
+  @@index([userId])
+}
+
+model ExchangeRate {
+  id           String   @id @default(cuid())
+  fromCurrency String
+  toCurrency   String
+  rate         Decimal  @db.Decimal(10, 6)
+  date         DateTime @db.Date
+
+  @@unique([fromCurrency, toCurrency, date])
+  @@index([fromCurrency, toCurrency, date])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isRevoked Boolean  @default(false)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model RecurringRule {
+  id           String          @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  amount       Decimal         @db.Decimal(15, 2)
+  currency     String
+  type         TransactionType
+  categoryId   String?
+  accountId    String
+  frequency    Frequency
+  startDate    DateTime        @db.Date
+  endDate      DateTime?       @db.Date
+  nextDueDate  DateTime        @db.Date
+  lastExecuted DateTime?
+  isActive     Boolean         @default(true)
+  autoCreate   Boolean         @default(false)
+  notes        String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account      Account         @relation(fields: [accountId], references: [id])
+  category     Category?       @relation(fields: [categoryId], references: [id])
+
+  @@index([userId])
+  @@index([nextDueDate])
+}

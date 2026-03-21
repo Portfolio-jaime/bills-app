@@ -1,0 +1,19 @@
+{
+  "name": "bills-app",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.25.0",
+  "scripts": {
+    "dev": "turbo run dev --filter='./apps/*' --filter='./packages/*'",
+    "build": "turbo run build --filter='./apps/*' --filter='./packages/*'",
+    "lint": "turbo run lint --filter='./apps/*' --filter='./packages/*'",
+    "typecheck": "turbo run typecheck --filter='./apps/*' --filter='./packages/*'",
+    "test": "turbo run test --filter='./apps/*' --filter='./packages/*'",
+    "clean": "turbo run clean --filter='./apps/*' --filter='./packages/*' && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3",
+    "prettier": "^3.4.2"
+  }
+}

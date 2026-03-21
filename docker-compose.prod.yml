@@ -1,0 +1,96 @@
+# docker-compose.prod.yml — Full stack production compose
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Build images first:
+#   docker build -f apps/api/Dockerfile -t bills-api:latest .
+#   docker build -f apps/web/Dockerfile -t bills-web:latest .
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bills-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bills}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bills_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-bills_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bills}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bills-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: bills-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:-redis_secret}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_secret}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bills-net
+
+  api:
+    image: bills-api:latest
+    container_name: bills-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-bills}:${POSTGRES_PASSWORD:-bills_secret}@postgres:5432/${POSTGRES_DB:-bills_db}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_secret}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      PORT: 3002
+      NODE_ENV: production
+      WEB_URL: ${WEB_URL:-http://localhost:3000}
+    ports:
+      - "3002:3002"
+    # Run migration before starting the app
+    command: >
+      sh -c "
+        npx prisma migrate deploy --schema=prisma/schema.prisma &&
+        node ../../node_modules/.bin/ts-node --transpile-only --project tsconfig.json -r ../../node_modules/tsconfig-paths/register src/main.ts
+      "
+    networks:
+      - bills-net
+
+  web:
+    image: bills-web:latest
+    container_name: bills-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3002/api/v1}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?NEXTAUTH_SECRET is required}
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - bills-net
+
+networks:
+  bills-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
