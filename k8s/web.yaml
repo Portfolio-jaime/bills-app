@@ -20,7 +20,7 @@ spec:
       containers:
         - name: web
           image: jaimehenao8126/bills-web:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:
