@@ -18,7 +18,7 @@ spec:
     directory:
       recurse: false
       include: "*.yaml"
-      exclude: "argocd-app.yaml,kind-config.yaml,deploy.sh"
+      exclude: "{argocd-app.yaml,kind-config.yaml,deploy.sh}"
 
   destination:
     server: https://kubernetes.default.svc
