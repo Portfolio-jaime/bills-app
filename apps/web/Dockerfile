@@ -1,7 +1,7 @@
 # ─── Bills App Web (Next.js 14) — Dockerfile ────────────────────────────────
 #
 # Usage (from monorepo root):
-#   docker build -f apps/web/Dockerfile -t bills-web .
+#   docker build -f apps/web/Dockerfile -t jaimehenao8126/bills-web:latest .
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Stage 1: Dependencies ─────────────────────────────────────────────────────

@@ -1,0 +1,42 @@
+---
+# ArgoCD Application — bills-app
+# Deploy with: kubectl apply -f k8s/argocd-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bills-app
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Portfolio-jaime/bills-app.git
+    targetRevision: main
+    path: k8s
+    directory:
+      recurse: false
+      include: "*.yaml"
+      exclude: "argocd-app.yaml,kind-config.yaml,deploy.sh"
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bills-app
+
+  syncPolicy:
+    automated:
+      prune: true        # Remove resources deleted from git
+      selfHeal: true     # Revert manual kubectl changes
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  revisionHistoryLimit: 5

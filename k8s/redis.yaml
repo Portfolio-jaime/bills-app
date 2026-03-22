@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: bills-redis
-  namespace: bills
+  namespace: bills-app
   labels:
     app: bills-redis
 spec:
@@ -55,7 +55,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bills-redis-svc
-  namespace: bills
+  namespace: bills-app
 spec:
   selector:
     app: bills-redis

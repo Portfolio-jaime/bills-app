@@ -2,15 +2,15 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: bills-config
-  namespace: bills
+  namespace: bills-app
 data:
   # API configuration
   PORT: "3002"
   NODE_ENV: "production"
   WEB_URL: "http://bills-web-svc"
-  # Web configuration
-  NEXT_PUBLIC_API_URL: "http://bills-api-svc:3002/api/v1"
-  NEXTAUTH_URL: "http://localhost:3000"
+  # Web configuration — browser accesses via ingress on port 80
+  NEXT_PUBLIC_API_URL: "http://localhost/api/v1"
+  NEXTAUTH_URL: "http://localhost"
   # PostgreSQL
   POSTGRES_DB: "bills_db"
   POSTGRES_USER: "bills"
