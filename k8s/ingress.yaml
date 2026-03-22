@@ -1,4 +1,3 @@
----
 # Nginx Ingress for Bills App
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -8,16 +7,15 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://bills.local"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PATCH, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
 spec:
   ingressClassName: nginx
   rules:
-    - host: localhost
+    - host: bills.local
       http:
         paths:
-          # Route /api/v1/* to the NestJS API — full path passed through (no rewrite)
           - path: /api/v1
             pathType: Prefix
             backend:
@@ -25,7 +23,6 @@ spec:
                 name: bills-api-svc
                 port:
                   number: 3002
-          # Route everything else to Next.js
           - path: /
             pathType: Prefix
             backend:
