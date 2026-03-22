@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: jaimehenao8126/bills-web:latest
+          image: jaimehenao8126/bills-web:ca2e39f0bbf52246630cb0c588968cdeaff6adfc
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
