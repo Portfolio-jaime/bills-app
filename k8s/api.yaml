@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: jaimehenao8126/bills-api:latest
+          image: jaimehenao8126/bills-api:b2f4f32ed521af4d920b769e575c6e8c745f6a0c
           imagePullPolicy: IfNotPresent
           # Find prisma CLI in pnpm store and run migrations, then start the server
           command:
