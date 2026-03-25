@@ -1,6 +1,12 @@
 import { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { api } from '@/lib/api'
+import axios from 'axios'
+
+// Server-side API URL: uses internal K8s service name (avoids ingress resolution)
+const serverApiUrl =
+  process.env.API_INTERNAL_URL ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  'http://localhost:3001/api/v1'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
         try {
-          const { data } = await api.post('/auth/login', {
+          const { data } = await axios.post(`${serverApiUrl}/auth/login`, {
             email: credentials.email,
             password: credentials.password,
           })

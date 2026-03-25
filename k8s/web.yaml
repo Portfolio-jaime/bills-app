@@ -44,6 +44,11 @@ spec:
                 configMapKeyRef:
                   name: bills-config
                   key: NODE_ENV
+            - name: API_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: bills-config
+                  key: API_INTERNAL_URL
           readinessProbe:
             httpGet:
               path: /

@@ -11,6 +11,8 @@ data:
   # Web configuration — browser accesses via ingress
   NEXT_PUBLIC_API_URL: "http://bills.local/api/v1"
   NEXTAUTH_URL: "http://bills.local"
+  # Server-side API URL (pod-to-pod, bypasses ingress)
+  API_INTERNAL_URL: "http://bills-api-svc:3002/api/v1"
   # PostgreSQL
   POSTGRES_DB: "bills_db"
   POSTGRES_USER: "bills"
