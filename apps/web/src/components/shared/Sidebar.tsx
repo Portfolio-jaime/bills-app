@@ -15,6 +15,7 @@ import {
   LogOut,
   TrendingUp,
   BarChart2,
+  ShieldCheck,
 } from 'lucide-react'
 import { useBudgetStatus } from '@/lib/queries/budgets'
 
@@ -84,6 +85,13 @@ export function Sidebar() {
         >
           <Settings className="h-4 w-4" />
           Settings
+        </Link>
+        <Link
+          href="/admin"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-orange-500/10 hover:text-orange-500 transition-colors"
+        >
+          <ShieldCheck className="h-4 w-4" />
+          Admin Panel
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}

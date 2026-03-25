@@ -12,6 +12,7 @@ import { BudgetsModule } from './budgets/budgets.module'
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module'
 import { DashboardModule } from './dashboard/dashboard.module'
 import { RecurringRulesModule } from './recurring-rules/recurring-rules.module'
+import { AdminModule } from './admin/admin.module'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RecurringRulesModule } from './recurring-rules/recurring-rules.module'
     ExchangeRatesModule,
     DashboardModule,
     RecurringRulesModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
