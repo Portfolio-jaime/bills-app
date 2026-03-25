@@ -10,6 +10,7 @@ env:
   DOCKERHUB_USER: jaimehenao8126
   API_IMAGE: jaimehenao8126/bills-api
   WEB_IMAGE: jaimehenao8126/bills-web
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # ── Lint & Typecheck ──────────────────────────────────────────────────────
